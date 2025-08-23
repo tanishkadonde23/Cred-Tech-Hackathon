@@ -16,7 +16,6 @@ import nltk
 nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
 
-
 # ✅ Tell Flask where templates + static files are
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -62,9 +61,9 @@ def ensure_schema():
 ensure_schema()
 # --------------------------------------------------
 
-# Load ML model (optional)
+# ✅ Load ML model (inside /backend, so no "backend/")
 try:
-    with open("backend/ml_model.pkl", "rb") as f:
+    with open("ml_model.pkl", "rb") as f:
         ml_model = pickle.load(f)
     ml_model_loaded = True
     print("✅ ML model loaded successfully")
@@ -76,17 +75,14 @@ except Exception as e:
 latest_scores = {}
 
 # ----------------- FRONTEND -----------------
-# ✅ First page: Company Explorer (main.html)
 @app.route("/", methods=["GET"])
 def explorer_page():
     return render_template("main.html")
 
-# ✅ Second page: Dashboard (index.html, used by script.js)
 @app.route("/dashboard", methods=["GET"])
 def home_page():
     return render_template("index.html")
 
-# ✅ Graphs page for each company
 @app.route("/graphs/<ticker>", methods=["GET"])
 def graphs_page(ticker):
     return render_template("graphs.html", ticker=ticker)
@@ -110,7 +106,6 @@ def predict():
             features = build_features(ticker)
             features["ticker"] = ticker  # important for explain_score
 
-            # use explain_score (handles rule + ml + events)
             result = explain_score(features)
 
             record = ScoreRecord(
@@ -196,6 +191,5 @@ atexit.register(lambda: scheduler.shutdown())
 
 # ----------------- Run -----------------
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))  # Railway provides PORT (e.g., 8888)
+    port = int(os.environ.get("PORT", 5000))  # Railway provides PORT
     app.run(host="0.0.0.0", port=port, debug=True)
-
