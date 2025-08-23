@@ -10,6 +10,12 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import pickle
 import os
+import nltk
+
+# Download punkt if not already available
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+
 
 # ✅ Tell Flask where templates + static files are
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))

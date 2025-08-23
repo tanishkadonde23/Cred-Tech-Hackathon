@@ -1,11 +1,16 @@
 flask
+gunicorn
+apscheduler
+sqlalchemy
 yfinance
 requests
 textblob
 nltk
-apscheduler
-sqlalchemy
-gunicorn
+shap
+pandas
+numpy
+scikit-learn
 python-dotenv
+
 
 
