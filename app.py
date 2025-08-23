@@ -12,10 +12,12 @@ import pickle
 import os
 
 # ✅ Tell Flask where templates + static files are
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 app = Flask(
     __name__,
-    template_folder=r"C:/Users/PRACHI/Documents/Hack1/backend/templates",
-    static_folder=os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
+    template_folder=os.path.join(BASE_DIR, "templates"),
+    static_folder=os.path.join(BASE_DIR, "static")
 )
 
 # ----------------- Database Setup -----------------

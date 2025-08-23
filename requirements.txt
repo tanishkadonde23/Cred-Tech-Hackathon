@@ -6,4 +6,6 @@ nltk
 apscheduler
 sqlalchemy
 gunicorn
+python-dotenv
+
 
