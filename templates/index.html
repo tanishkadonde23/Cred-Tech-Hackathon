@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Explainable Credit Intelligence Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <!-- Navigation -->
+  <!-- Navigation -->
+<nav class="navbar">
+  <div class="logo">CredTech</div>
+</nav>
+
+
+  <!-- Search Section -->
+  <section class="search-section">
+    <h1>Explainable Credit Intelligence</h1>
+    <p>Enter ticker symbols (comma separated) to fetch real-time credit scores</p>
+    <div class="search-box">
+      <input type="text" id="tickerInput" placeholder="TSLA, AAPL, MSFT">
+      <button onclick="getScores()">Get Scores</button>
+    </div>
+  </section>
+
+  <!-- Results -->
+  <section id="results" class="results-grid"></section>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

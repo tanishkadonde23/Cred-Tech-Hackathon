@@ -1,0 +1,8 @@
+flask
+yfinance
+requests
+textblob
+nltk
+apscheduler
+sqlalchemy
+
