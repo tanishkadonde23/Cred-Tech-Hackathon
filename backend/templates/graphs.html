@@ -1,0 +1,227 @@
+=<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ ticker }} Graphs</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Chart.js Zoom Plugin -->
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111827;
+      color: white;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+
+    nav {
+      text-align: left;
+      margin-bottom: 20px;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: #3b82f6;
+      font-weight: bold;
+    }
+
+    h1 {
+      margin-bottom: 30px;
+    }
+
+    .graph-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 20px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .chart-box {
+      background: #1f2937;
+      border-radius: 12px;
+      padding: 15px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+      transition: transform 0.2s ease;
+    }
+
+    .chart-box:hover {
+      transform: scale(1.02);
+    }
+
+    canvas {
+      max-height: 300px;
+    }
+
+    .controls {
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/">⬅ Back to Dashboard</a>
+  </nav>
+
+  <h1>{{ ticker }} - Credit Score Graphs</h1>
+
+  <div class="controls">
+    <button onclick="resetZoom()">🔄 Reset Zoom</button>
+  </div>
+
+  <div class="graph-container">
+    <div class="chart-box">
+      <canvas id="trendChart"></canvas>
+    </div>
+    <div class="chart-box">
+      <canvas id="featuresChart"></canvas>
+    </div>
+    <div class="chart-box">
+      <canvas id="sentimentChart"></canvas>
+    </div>
+  </div>
+
+  <script>
+    let trendChart, featuresChart, sentimentChart;
+
+    async function loadGraphs(ticker) {
+      const res = await fetch(`/history/${ticker}`);
+      const data = await res.json();
+
+      if (!data.length) {
+        alert("No data found for " + ticker);
+        return;
+      }
+
+      // Destroy old charts if exist (for live refresh)
+      if (trendChart) trendChart.destroy();
+      if (featuresChart) featuresChart.destroy();
+      if (sentimentChart) sentimentChart.destroy();
+
+      // --- Trend Line Chart ---
+      trendChart = new Chart(document.getElementById("trendChart"), {
+        type: "line",
+        data: {
+          labels: data.map(r => new Date(r.timestamp).toLocaleTimeString()),
+          datasets: [
+            { label: "Final Score", data: data.map(r => r.final_score), borderColor: "red", tension: 0.3, fill: false },
+            { label: "Rule Score", data: data.map(r => r.rule_score), borderColor: "blue", tension: 0.3, fill: false },
+            { label: "ML Score", data: data.map(r => r.ml_score), borderColor: "green", tension: 0.3, fill: false }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              labels: { color: "white" },
+              onClick: (e, legendItem, legend) => {
+                const index = legendItem.datasetIndex;
+                const ci = legend.chart;
+                ci.toggleDataVisibility(index);
+                ci.update();
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(ctx) {
+                  return ctx.dataset.label + ": " + ctx.raw + " points";
+                }
+              }
+            },
+            zoom: {
+              zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: "xy" },
+              pan: { enabled: true, mode: "xy" }
+            }
+          },
+          scales: {
+            x: { ticks: { color: "white" } },
+            y: { ticks: { color: "white" } }
+          },
+          onClick: function(evt, elements) {
+            if (elements.length > 0) {
+              const i = elements[0].index;
+              alert(`📊 Timestamp: ${data[i].timestamp}\nFinal Score: ${data[i].final_score}`);
+            }
+          }
+        }
+      });
+
+      // --- Feature Importance (bar) ---
+      let latest = data[0];
+      let featNames = Object.keys(latest.features).slice(0, 6);
+      let featValues = Object.values(latest.features).slice(0, 6);
+
+      featuresChart = new Chart(document.getElementById("featuresChart"), {
+        type: "bar",
+        data: {
+          labels: featNames,
+          datasets: [{ label: "Feature Values", data: featValues, backgroundColor: "#36a2eb" }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { labels: { color: "white" } },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => `${ctx.chart.data.labels[ctx.dataIndex]}: ${ctx.raw}`
+              }
+            }
+          },
+          scales: {
+            x: { ticks: { color: "white" } },
+            y: { ticks: { color: "white" } }
+          },
+          onClick: function(evt, elements) {
+            if (elements.length > 0) {
+              const i = elements[0].index;
+              alert(`🔍 Feature: ${featNames[i]}\nValue: ${featValues[i]}`);
+            }
+          }
+        }
+      });
+
+      // --- Sentiment Pie Chart ---
+      let sentiment = latest.features.news_sentiment || 0;
+      sentimentChart = new Chart(document.getElementById("sentimentChart"), {
+        type: "pie",
+        data: {
+          labels: ["Positive", "Neutral", "Negative"],
+          datasets: [{
+            data: [
+              sentiment > 0 ? sentiment : 0,
+              sentiment === 0 ? 1 : 0,
+              sentiment < 0 ? Math.abs(sentiment) : 0
+            ],
+            backgroundColor: ["green", "gray", "red"]
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { labels: { color: "white" } } },
+          onClick: function(evt, elements) {
+            if (elements.length > 0) {
+              const i = elements[0].index;
+              const label = sentimentChart.data.labels[i];
+              alert(`📰 Sentiment clicked: ${label}`);
+            }
+          }
+        }
+      });
+    }
+
+    // Reset zoom
+    function resetZoom() {
+      if (trendChart) trendChart.resetZoom();
+    }
+
+    // Load initial graphs
+    loadGraphs("{{ ticker }}");
+
+    // Auto refresh every 15s
+    setInterval(() => loadGraphs("{{ ticker }}"), 15000);
+  </script>
+</body>
+</html>

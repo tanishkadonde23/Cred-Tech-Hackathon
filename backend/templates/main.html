@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Company Explorer</title>
+
+  <style>
+    body {
+      background: #0b0f19;
+      color: #e2e8f0;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      /* faint stock-line background */
+      background-image: 
+        linear-gradient(rgba(56,189,248,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(56,189,248,0.05) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #38bdf8;
+      margin-bottom: 6px;
+    }
+    p { color: #94a3b8; margin-bottom: 20px; }
+
+    select, button {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: none;
+      margin: 4px;
+      font-size: 14px;
+    }
+    select { background: #1e293b; color: #fff; }
+    button { cursor: pointer; font-weight: bold; }
+    #scoresBtn, #gotoScores { background: #3b82f6; color: #fff; }
+    #resetBtn { background: #475569; color: #fff; }
+
+    .card {
+      background: #111827;
+      border: 1px solid #1e3a8a;
+      border-radius: 14px;
+      padding: 20px;
+      margin-top: 20px;
+      width: 90%;
+      max-width: 900px;
+      display: none;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .header img {
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+      background: #fff;
+      object-fit: contain;
+      padding: 4px;
+    }
+    .header h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      color: #f1f5f9;
+    }
+    .header span { font-size: 0.9rem; color: #94a3b8; }
+
+    .description { margin: 14px 0; font-size: 0.95rem; color: #cbd5e1; }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin: 12px 0;
+    }
+    .info-box {
+      background: rgba(30,58,138,0.3);
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+    .info-box strong { display: block; color: #38bdf8; }
+
+    .tabs {
+      display: flex;
+      gap: 16px;
+      margin: 16px 0;
+      border-bottom: 1px solid #1e3a8a;
+    }
+    .tab {
+      cursor: pointer;
+      padding: 6px 10px;
+      color: #94a3b8;
+      font-size: 0.9rem;
+    }
+    .tab.active {
+      color: #38bdf8;
+      border-bottom: 2px solid #38bdf8;
+    }
+    .tab-content { margin-top: 12px; font-size: 0.9rem; color: #cbd5e1; }
+
+    .footer {
+      margin-top: 20px;
+      font-size: 0.75rem;
+      color: #64748b;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>📊 Company Explorer</h1>
+  <p>Detailed, hardcoded company profiles for Tesla, Apple, and Microsoft.</p>
+
+  <div>
+    <select id="companySelect">
+      <option value="">Choose company…</option>
+      <option value="TSLA">Tesla — TSLA</option>
+      <option value="AAPL">Apple — AAPL</option>
+      <option value="MSFT">Microsoft — MSFT</option>
+    </select>
+    <button id="scoresBtn">View Scores</button>
+    <button id="resetBtn">Reset</button>
+  </div>
+
+  <div id="profileCard" class="card">
+    <div class="header">
+      <img id="companyLogo" src="" alt="logo">
+      <div>
+        <h2 id="companyName"></h2>
+        <span id="companyTicker"></span>
+      </div>
+    </div>
+    <div id="companyDesc" class="description"></div>
+
+    <div class="info-grid" id="metrics"></div>
+
+    <div class="tabs">
+      <div class="tab active" data-tab="overview">Overview</div>
+      <div class="tab" data-tab="financials">Financials</div>
+      <div class="tab" data-tab="milestones">Milestones</div>
+      <div class="tab" data-tab="leadership">Leadership</div>
+      <div class="tab" data-tab="media">Media</div>
+    </div>
+
+    <div id="tabContent" class="tab-content">Select a company to view details.</div>
+
+    <div style="margin-top:16px; display:flex; justify-content:space-between;">
+      <span style="font-size:0.85rem; color:#94a3b8;">Selected ticker: <span id="selectedTicker" style="color:#38bdf8; font-weight:bold;"></span></span>
+      <button id="gotoScores">Open Scores →</button>
+    </div>
+  </div>
+
+  <div class="footer">
+    Hardcoded demo. Extend the data object in the page to add more companies.
+  </div>
+
+  <script>
+    const data = {
+      TSLA: {
+        name: "Tesla, Inc.",
+        ticker: "TSLA",
+        logo: "https://upload.wikimedia.org/wikipedia/commons/b/bd/Tesla_Motors.svg",
+        desc: "Tesla designs and manufactures EVs, battery storage, and solar technology.",
+        metrics: {
+          "Founded": "2003 (Martin Eberhard & Marc Tarpenning; Elon Musk joined early)",
+          "CEO": "Elon Musk",
+          "Employees": "~140,000 (2023)",
+          "Market Cap": "$800B"
+        },
+        tabs: {
+          overview: "Tesla is known for EVs, Gigafactories, and clean energy solutions.",
+          financials: "Revenue: $95B (2023 est). Net Income: $12B.",
+          milestones: "2008: Roadster | 2012: Model S | 2015: Powerwall | 2020: Giga Berlin.",
+          leadership: "CEO: Elon Musk, CFO: Vaibhav Taneja, CTO: Drew Baglino.",
+          media: "Key models: Tesla Roadster, Model S, Model X, Cybertruck."
+        }
+      },
+      AAPL: {
+        name: "Apple Inc.",
+        ticker: "AAPL",
+        logo: "https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg",
+        desc: "Apple designs iPhones, Macs, iPads, wearables, and services.",
+        metrics: {
+          "Founded": "1976 (Steve Jobs, Steve Wozniak, Ronald Wayne)",
+          "CEO": "Tim Cook",
+          "Employees": "~160,000 (2023)",
+          "Market Cap": "$2.5T"
+        },
+        tabs: {
+          overview: "Apple is famous for iPhone, Mac, iPad, Apple Watch, and ecosystem.",
+          financials: "Revenue: $385B (2023). Net Income: $99B.",
+          milestones: "1984: Macintosh | 2007: iPhone | 2010: iPad | 2015: Watch.",
+          leadership: "CEO: Tim Cook, CFO: Luca Maestri, COO: Jeff Williams.",
+          media: "Flagships: iPhone 15, MacBook Pro, iPad Pro, Vision Pro."
+        }
+      },
+      MSFT: {
+        name: "Microsoft Corporation",
+        ticker: "MSFT",
+        logo: "https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg",
+        desc: "Microsoft develops software, cloud services, and AI solutions.",
+        metrics: {
+          "Founded": "1975 (Bill Gates & Paul Allen)",
+          "CEO": "Satya Nadella",
+          "Employees": "~220,000 (2023)",
+          "Market Cap": "$2.3T"
+        },
+        tabs: {
+          overview: "Microsoft is known for Windows, Office, Azure, and Xbox.",
+          financials: "Revenue: $230B (2023). Net Income: $72B.",
+          milestones: "1985: Windows | 2001: Xbox | 2010: Azure | 2023: Copilot AI.",
+          leadership: "CEO: Satya Nadella, CFO: Amy Hood, CTO: Kevin Scott.",
+          media: "Products: Windows 11, Xbox Series X, Surface Pro, Azure AI."
+        }
+      }
+    };
+
+    const companySelect = document.getElementById('companySelect');
+    const profileCard = document.getElementById('profileCard');
+    const logo = document.getElementById('companyLogo');
+    const name = document.getElementById('companyName');
+    const ticker = document.getElementById('companyTicker');
+    const desc = document.getElementById('companyDesc');
+    const metricsDiv = document.getElementById('metrics');
+    const selectedTicker = document.getElementById('selectedTicker');
+    const tabContent = document.getElementById('tabContent');
+    const tabs = document.querySelectorAll('.tab');
+
+    function showProfile(t) {
+      const c = data[t];
+      if (!c) return;
+      logo.src = c.logo;
+      name.innerText = c.name;
+      ticker.innerText = c.ticker;
+      desc.innerText = c.desc;
+      selectedTicker.innerText = c.ticker;
+      metricsDiv.innerHTML = "";
+      Object.entries(c.metrics).forEach(([k,v])=>{
+        metricsDiv.innerHTML += `<div class="info-box"><strong>${k}</strong>${v}</div>`;
+      });
+      profileCard.style.display = "block";
+      localStorage.setItem('lastCompany', t);
+      switchTab("overview", c);
+    }
+
+    function switchTab(tab, c) {
+      tabContent.innerText = c.tabs[tab];
+    }
+
+    companySelect.addEventListener('change', e => showProfile(e.target.value));
+    tabs.forEach(t => {
+      t.addEventListener('click', () => {
+        tabs.forEach(tt => tt.classList.remove('active'));
+        t.classList.add('active');
+        const current = companySelect.value || localStorage.getItem('lastCompany');
+        if (current) switchTab(t.dataset.tab, data[current]);
+      });
+    });
+    document.getElementById('resetBtn').addEventListener('click', ()=>{
+      localStorage.removeItem('lastCompany');
+      companySelect.value = "";
+      profileCard.style.display = "none";
+    });
+    document.getElementById('gotoScores').addEventListener('click', ()=>{
+      const sel = companySelect.value || localStorage.getItem('lastCompany');
+      if (!sel) return alert("Choose a company first");
+      window.location.href = "/dashboard";
+    });
+    document.getElementById('scoresBtn').addEventListener('click', ()=>{
+      const sel = companySelect.value || localStorage.getItem('lastCompany');
+      if (!sel) return alert("Choose a company first");
+      window.location.href = "/dashboard";
+    });
+
+    window.addEventListener('load', ()=>{
+      const last = localStorage.getItem('lastCompany');
+      if (last) { companySelect.value = last; showProfile(last); }
+    });
+  </script>
+</body>
+</html>

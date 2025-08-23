@@ -1,0 +1,163 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+  background: #0d1117;
+  color: #e6edf3;
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #010409;
+  padding: 1rem 2rem;
+  border-bottom: 2px solid #1f6feb;
+}
+
+.navbar .logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #58a6ff;
+}
+
+.navbar .nav-links {
+  list-style: none;
+  display: flex;
+  gap: 1.5rem;
+}
+
+.navbar .nav-links a {
+  text-decoration: none;
+  color: #c9d1d9;
+  transition: 0.3s;
+}
+.navbar .nav-links a:hover { color: #58a6ff; }
+
+/* Search Section */
+.search-section {
+  text-align: center;
+  margin: 3rem auto 1rem;
+  padding: 2rem 1rem 0;
+}
+.search-section h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: #58a6ff;
+}
+.search-box { margin-top: 1.5rem; }
+.search-box input {
+  width: 300px;
+  padding: 0.7rem;
+  border-radius: 8px;
+  border: none;
+  margin-right: 0.5rem;
+}
+.search-box button {
+  background: #238636;
+  color: #fff;
+  padding: 0.7rem 1.2rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.search-box button:hover { background: #2ea043; }
+
+/* Results Grid — centered */
+.results-grid {
+  display: grid;
+  /* Fixed track width with responsive minimum; keeps cards centered */
+  grid-template-columns: repeat(auto-fit, minmax(300px, 360px));
+  gap: 1.5rem;
+  padding: 2rem 1.5rem 3rem;
+  justify-content: center;   /* center the grid tracks horizontally */
+  margin: 0 auto;            /* center the whole grid block */
+  max-width: 1400px;         /* prevents stretching too wide on big screens */
+}
+
+/* Card */
+.card {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: transform 0.2s, border 0.2s, box-shadow 0.2s;
+  width: 100%;               /* fill the grid track */
+}
+.card:hover {
+  transform: translateY(-5px);
+  border: 1px solid #58a6ff;
+  box-shadow: 0 8px 24px rgba(24, 119, 242, 0.15);
+}
+
+/* Card Header */
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 1rem;
+}
+.company-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: contain;
+  background: #fff;
+  padding: 3px;
+}
+.company-name {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #58a6ff;
+}
+
+/* Subtitles */
+.card h4 {
+  margin-top: 1rem;
+  color: #79c0ff;
+}
+.card ul {
+  margin-top: 0.5rem;
+  padding-left: 1.5rem;
+}
+
+/* Events */
+.events-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 150px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+.event-card {
+  display: flex;
+  align-items: center;
+  background: #1e2633;
+  border-radius: 6px;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.9rem;
+  border: 1px solid #30363d;
+  transition: background 0.2s;
+}
+.event-card:hover { background: #2d3647; }
+.event-icon { margin-right: 0.5rem; font-size: 1.1rem; }
+.event-text { flex: 1; color: #c9d1d9; }
+.event-sentiment { font-size: 0.8rem; color: #8b949e; margin-left: 0.5rem; }
+
+/* --- New Code: Center CredTech in Navbar --- */
+.navbar {
+  justify-content: center;   /* center content */
+}
+
+.navbar .logo {
+  font-size: 1.8rem;  /* slightly bigger for visibility */
+  text-align: center;
+}
